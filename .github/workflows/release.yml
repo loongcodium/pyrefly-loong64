@@ -82,6 +82,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           prefix-key: pyrefly-extension
+      - name: Set JEMALLOC_SYS_WITH_LG_PAGE=16 for `cross`
+        if: ${{ matrix.rust_target == 'loongarch64-unknown-linux-gnu' }}
+        run: echo "target.${{ matrix.rust_target }}.env.passthrough=[\"JEMALLOC_SYS_WITH_LG_PAGE=16\"]" > Cross.toml
       - name: build pyrefly binary (cross-compile)
         if: ${{ matrix.rust_target != '' }}
         uses: houseabsolute/actions-rust-cross@v1
