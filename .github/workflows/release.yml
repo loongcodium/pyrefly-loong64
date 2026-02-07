@@ -70,6 +70,17 @@ jobs:
         with:
           repository: facebook/pyrefly
           ref: ${{ needs.determine_version.outputs.version }}
+      
+      - uses: actions/checkout@v6
+        with:
+          path: pyrefly-loong64
+          sparse-checkout: |
+            patches
+      - name: Apply patch
+        run: |
+          git apply pyrefly-loong64/patches/*.patch
+          rm -rf pyrefly-loong64
+
       - name: Read rust-toolchain file
         # matrix.github_env is necessary to differentiate between windows and linux environment variables
         # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#environment-files
