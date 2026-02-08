@@ -102,7 +102,7 @@ jobs:
         with:
           command: build
           target: ${{ matrix.rust_target }}
-          args: "--release --all-features --artifact-dir lsp/bin --manifest-path pyrefly/Cargo.toml -Z unstable-options"
+          args: "--release --artifact-dir lsp/bin --manifest-path pyrefly/Cargo.toml -Z unstable-options"
           toolchain: ${{ env.toolchain }}
           cross-version: fb2bd30 # Latest version with LoongArch64 support currently
 
