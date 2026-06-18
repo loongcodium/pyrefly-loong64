@@ -71,14 +71,9 @@ jobs:
           repository: facebook/pyrefly
           ref: ${{ needs.determine_version.outputs.version }}
 
-      - name: Read rust-toolchain file
-        # matrix.github_env is necessary to differentiate between windows and linux environment variables
-        # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#environment-files
-        # https://stackoverflow.com/questions/66733076/github-actions-set-environment-variable-for-windows-build-with-powershell
-        run: echo "toolchain=$(cat pyrefly/rust-toolchain)" && echo "toolchain=$(cat pyrefly/rust-toolchain)" >> ${{ matrix.github_env }}
       - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ env.toolchain }}
+          toolchain: stable
       - name: set up rust cache
         uses: Swatinem/rust-cache@v2
         with:
@@ -92,9 +87,19 @@ jobs:
         with:
           command: build
           target: ${{ matrix.rust_target }}
-          args: "--release --artifact-dir lsp/bin --manifest-path pyrefly/Cargo.toml -Z unstable-options"
-          toolchain: ${{ env.toolchain }}
+          args: "--release --manifest-path pyrefly/Cargo.toml"
+          toolchain: stable
           cross-version: fb2bd30 # Latest version with LoongArch64 support currently
+      - name: copy binary to lsp/bin
+        shell: bash
+        run: |
+          mkdir -p lsp/bin
+          if [ -n "${{ matrix.rust_target }}" ]; then
+            src="target/${{ matrix.rust_target }}/release"
+          else
+            src="target/release"
+          fi
+          cp "$src/pyrefly" lsp/bin/
 
       - uses: actions/setup-node@v6
         with:
