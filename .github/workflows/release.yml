@@ -34,12 +34,14 @@ jobs:
           else
             echo "Checking for newer upstream version..."
             sudo apt-get update && sudo apt-get install -y jq
-            UPSTREAM_VERSION=$(curl -s https://api.github.com/repos/facebook/pyrefly/releases/latest | jq -r .tag_name)
+            UPSTREAM_VERSION=$(curl -sL https://api.github.com/repos/facebook/pyrefly/releases/latest | jq -r .tag_name)
             OWN_VERSION=$(curl -sL https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name || echo "v0.0.0")
             echo "Upstream version: $UPSTREAM_VERSION"
             echo "Own version: $OWN_VERSION"
             UPSTREAM_VERSION_NUM=${UPSTREAM_VERSION#v}
+            dpkg --validate-version "$UPSTREAM_VERSION_NUM"
             OWN_VERSION_NUM=${OWN_VERSION#v}
+            dpkg --validate-version "$OWN_VERSION_NUM"
             if dpkg --compare-versions "$UPSTREAM_VERSION_NUM" "gt" "$OWN_VERSION_NUM"; then
               echo "Newer upstream version found: $UPSTREAM_VERSION"
               echo "should_build=true" >> $GITHUB_OUTPUT
